@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Course Recommendations{% endblock %}
+
+{% block head %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .search-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .course-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        height: 100%;
+    }
+    
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .course-img {
+        height: 160px;
+        object-fit: cover;
+    }
+    
+    .btn-primary {
+        background-color: var(--secondary);
+        border-color: var(--secondary);
+    }
+    
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+    }
+    
+    .btn-outline-primary {
+        color: var(--secondary);
+        border-color: var(--secondary);
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--secondary);
+        border-color: var(--secondary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section p-5 mb-5 text-center">
+    <h1 class="display-4 fw-bold">Find Your Perfect Course</h1>
+    <p class="lead">Discover personalized course recommendations powered by AI</p>
+</div>
+
+<div class="row justify-content-center mb-5">
+    <div class="col-lg-8">
+        <div class="card search-card">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Course Recommender</h2>
+                
+                {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endif %}
+                
+                <form action="/" method="POST">
+                    <div class="mb-3">
+                        <label for="course_name" class="form-label">Search for a course:</label>
+                        <input type="text" class="form-control form-control-lg" 
+                               id="course_name" name="course_name" 
+                               placeholder="Start typing a course name..." 
+                               value="{{ selected_course if selected_course else '' }}" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i> Get Recommendations
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if recommendations %}
+<div class="row mb-4">
+    <div class="col">
+        <h3 class="mb-4">
+            {% if selected_course %}
+            Courses similar to <span class="text-primary">"{{ selected_course }}"</span>
+            {% else %}
+            Recommended Courses
+            {% endif %}
+        </h3>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for course in recommendations %}
+    <div class="col">
+        <div class="card course-card h-100">
+            <img src="https://source.unsplash.com/random/300x200/?education,learning,{{ loop.index }}" 
+                 class="card-img-top course-img" alt="{{ course.name }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ course.name }}</h5>
+            </div>
+            <div class="card-footer bg-transparent">
+                <a href="{{ course.url }}" target="_blank" class="btn btn-outline-primary w-100">
+                    View Course <i class="fas fa-external-link-alt ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(function() {
+    $("#course_name").autocomplete({
+        source: function(request, response) {
+            $.getJSON("/autocomplete", {
+                term: request.term
+            }, response);
+        },
+        minLength: 2,
+        select: function(event, ui) {
+            $("#course_name").val(ui.item.value);
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

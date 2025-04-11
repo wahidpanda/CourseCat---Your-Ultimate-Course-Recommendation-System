@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <style>
+        .course-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .course-img {
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .back-btn {
+            margin-bottom: 30px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <a href="/" class="btn btn-outline-primary back-btn">
+        <i class="fas fa-arrow-left me-2"></i> Back to Search
+    </a>
+    
+    <h2 class="mb-4">Courses Similar to "{{ course_name }}"</h2>
+    
+    {% if recommendations %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for course in recommendations %}
+                <div class="col">
+                    <div class="card course-card h-100">
+                        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3" 
+                             class="card-img-top course-img" alt="{{ course.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ course.name }}</h5>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="{{ course.url }}" target="_blank" class="btn btn-primary w-100">
+                                View Course <i class="fas fa-external-link-alt ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning">No recommendations found for this course.</div>
+    {% endif %}
+{% endblock %}
